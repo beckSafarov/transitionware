@@ -4,7 +4,7 @@ import { sendToken } from '../utils/sendToken.js'
 import jwt from 'jsonwebtoken'
 /**
  * @desc Sign up
- * @route POST /api/users
+ * @route POST /api/auth
  */
 export const signUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body
@@ -21,7 +21,7 @@ export const signUser = asyncHandler(async (req, res) => {
 
 /**
  * @desc Log in
- * @route POST /api/users/login
+ * @route POST /api/auth/login
  */
 export const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body
@@ -40,7 +40,7 @@ export const authUser = asyncHandler(async (req, res) => {
 
 /**
  * @desc currently logged in user
- * @route GET /api/users/me
+ * @route GET /api/auth/me
  */
 export const me = asyncHandler(async (req, res, next) => {
   if (!req.cookies.token) return res.status(200).json({ success: false, message: 'Not logged' })
@@ -56,7 +56,7 @@ export const me = asyncHandler(async (req, res, next) => {
 
 /**
  * @desc user logs out
- * @route PUT /api/users/logout
+ * @route PUT /api/auth/logout
  */
 export const logout = asyncHandler(async (req, res, next) => {
   res.clearCookie('token')

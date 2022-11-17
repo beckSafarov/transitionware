@@ -5,6 +5,7 @@ import connectDB from './config/db.js'
 import cookieParser from 'cookie-parser'
 import { signUser } from './controllers/authControllers.js'
 import authRoutes from './routes/authRoutes.js'
+import userRoutes from './routes/userRoutes.js'
 const app = express()
 dotenv.config()
 app.use(express.json())
@@ -15,7 +16,8 @@ app.get('/', (req, res) => {
   //this sends content for displaying, however, you would want a file here
   res.send('<h1>Hello World</h1>')
 })
-app.use('/api/users', authRoutes)
+app.use('/api/auth', authRoutes)
+app.use('/api/users', userRoutes)
 
 
 
