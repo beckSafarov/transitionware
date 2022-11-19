@@ -18,6 +18,14 @@ const userSchema = mongoose.Schema(
       minLength: 1, 
       select: false, 
     },
+    lastLoggedDate: {
+      type: Date, 
+      default: new Date()
+    },
+    regDate: {
+      type: Date, 
+      default: new Date()
+    },
     isBlocked: {
       type: Boolean, 
       default: false, 

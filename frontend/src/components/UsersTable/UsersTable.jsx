@@ -12,7 +12,10 @@ import { useEffect } from 'react'
 import axios from 'axios'
 import UsersTableHead from './UsersTableHead'
 import UsersTableToolbar from './UsersTableToolbar'
-
+import { fullConfig } from '../../utils/rxConfig'
+import LinearLoading from '../LinearLoading'
+import { clearStore } from '../../utils/lcs'
+import {useNavigate} from 'react-router-dom'
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -36,20 +39,25 @@ export default function UsersTable({user}) {
   const [selected, setSelected] = useState([])
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(5)
+  const [loading, setLoading] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
-  useEffect(()=>{
-    if(allUsers.length < 1) getUsersFromDB()
-  }, [allUsers])
+  const navigate = useNavigate()
+  useEffect(() => {
+    getUsersFromDB()
+  }, [])
 
   const getUsersFromDB = async() => {
     try{
+      setLoading(true)
       const res = await axios.get('/api/users')
+      setLoading(false)
       setAllUsers(res.data.data)
     }catch(error){
+      setLoading(false)
       console.error(error)
     }
   }
-  console.log(selected)
+
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc'
     setOrder(isAsc ? 'desc' : 'asc')
@@ -59,27 +67,16 @@ export default function UsersTable({user}) {
   const handleSelectAllClick = ({ target }) => {
     setSelected(target.checked ? allUsers : [])
   }
-  console.log(selected)
-  const handleClick = (clickedRow) => {
-    // console.log(clickedRow);
-    setSelected([clickedRow])
-    // const selectedIndex = selected.indexOf(name)
-    // let newSelected = []
 
-    // if (selectedIndex === -1) {
-    //   newSelected = newSelected.concat(selected, name)
-    // } else if (selectedIndex === 0) {
-    //   newSelected = newSelected.concat(selected.slice(1))
-    // } else if (selectedIndex === selected.length - 1) {
-    //   newSelected = newSelected.concat(selected.slice(0, -1))
-    // } else if (selectedIndex > 0) {
-    //   newSelected = newSelected.concat(
-    //     selected.slice(0, selectedIndex),
-    //     selected.slice(selectedIndex + 1)
-    //   )
-    // }
-
-    // setSelected(newSelected)
+  const handleClick = (clickedUser) => {
+    const doesAlreadyExist = selected.find(
+      (elem) => elem._id === clickedUser._id
+    )
+    if (!doesAlreadyExist) {
+      setSelected([...selected, clickedUser])
+      return
+    }
+    setSelected(selected.filter((elem) => elem._id !== clickedUser._id))
   }
 
   const handleChangePage = (event, newPage) => {
@@ -91,24 +88,98 @@ export default function UsersTable({user}) {
     setPage(0)
   }
 
-  const isSelected = ({id}) => {
-    return !!selected.find(item=>item.id === id)
+  const blockLocally = () => {
+    setAllUsers(
+      allUsers.map((currUser) => {
+        const foundUser = selected.find((curr) => curr._id === currUser._id)
+        if (!foundUser) return currUser
+        foundUser.isBlocked = !foundUser.isBlocked
+        return foundUser
+      })
+    )
+  }
+
+  const sendBlockRequest = async(params) => {
+    try{
+      setLoading(true)
+      await axios.put('/api/users', {users: selected}, fullConfig)
+      setLoading(false)
+    }catch(error){
+      setLoading(false)
+      console.error(error)
+    }
+  }
+
+  const handleBlock = async() => {
+    if(!window.confirm('Are you sure?')) return
+    blockLocally()
+    await sendBlockRequest()
+    setSelected([])
+  }
+
+  const deleteLocally = () => {
+    if (selected.length === allUsers.length) {
+      setAllUsers([])
+      return
+    } 
+    setAllUsers(
+      allUsers.filter(
+        (currUser) =>
+          !selected.find((deletedUser) => deletedUser._id === currUser._id)
+      )
+    )
+  }
+
+  const sendDeleteRequest = async() => {
+    try {
+      setLoading(true)
+      await axios.delete('/api/users', { users: selected }, fullConfig)
+      setLoading(false)
+    } catch (error) {
+      setLoading(false)
+      console.error(error)
+    }
+  }
+
+  const handleSuicide = () => {
+    if (
+      allUsers.length < 1 ||
+      !allUsers.find((someUser) => someUser._id === user._id)
+    ) {
+      clearStore('users')
+      navigate('/login')
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure?')) return
+    deleteLocally()
+    await sendDeleteRequest()
+    handleSuicide()
+    setSelected([])
+  }
+
+  const isSelected = (_id) => {
+    return !!selected.find(item=>item._id === _id)
   }
 
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - allUsers.length) : 0
-
+  // console.log(allUsers)
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <UsersTableToolbar numSelected={selected.length} />
+        <UsersTableToolbar
+          numSelected={selected.length}
+          onBlock={handleBlock}
+          onDelete={handleDelete}
+        />
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
             aria-labelledby='tableTitle'
             size={'medium'}
           >
-
             <UsersTableHead
               numSelected={selected.length}
               order={order}
@@ -132,8 +203,11 @@ export default function UsersTable({user}) {
                       role='checkbox'
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row.name}
+                      key={index}
                       selected={isItemSelected}
+                      style={{
+                        background: user._id === row._id ? '#e6e6e6' : 'auto',
+                      }}
                     >
                       <TableCell padding='checkbox'>
                         <Checkbox
@@ -154,22 +228,20 @@ export default function UsersTable({user}) {
                       </TableCell>
                       <TableCell align='left'>{row._id}</TableCell>
                       <TableCell align='left'>{row.email}</TableCell>
-                      <TableCell align='left'>{row.isBlocked ? 'blocked' : 'active'}</TableCell>
-                      <TableCell align='left'>{
-                        'May 24, 2022'
-                      }</TableCell>
-                      <TableCell align='left'>{
-                        'May 24, 2022'
-                      }</TableCell>
+                      <TableCell align='left'>
+                        {row.isBlocked ? 'blocked' : 'active'}
+                      </TableCell>
+                      <TableCell align='left'>
+                        {row.lastLoggedDate?.toDateString?.() || 'May 24, 2022'}
+                      </TableCell>
+                      <TableCell align='left'>
+                        {row.regDate?.toDateString?.() || 'May 24, 2022'}
+                      </TableCell>
                     </TableRow>
                   )
                 })}
               {emptyRows > 0 && (
-                <TableRow
-                  style={{
-                    height: 53 * emptyRows,
-                  }}
-                >
+                <TableRow style={{ height: 53 * emptyRows }}>
                   <TableCell colSpan={6} />
                 </TableRow>
               )}
@@ -185,6 +257,7 @@ export default function UsersTable({user}) {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
+        <LinearLoading show={loading} />
       </Paper>
     </Box>
   )

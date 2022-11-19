@@ -34,7 +34,8 @@ export const authUser = asyncHandler(async (req, res) => {
     throw new Error(`Invalid credentials`)
   }
 
-  user.password = undefined
+  user.lastLoggedDate = new Date()
+  await user.save()
   sendToken(user.id, res, user)
 })
 

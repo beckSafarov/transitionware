@@ -5,8 +5,9 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import BlockIcon from '@mui/icons-material/Block'
 import Tooltip from '@mui/material/Tooltip'
 import { alpha } from '@mui/material/styles'
+import LinearLoading from '../LinearLoading'
 
-const UsersTableToolbar =({numSelected, onBlock, onDelete})=>{
+const UsersTableToolbar =({numSelected, onBlock, onDelete, loading})=>{
 
   return (
     <Toolbar
@@ -32,19 +33,21 @@ const UsersTableToolbar =({numSelected, onBlock, onDelete})=>{
           {numSelected} selected
         </Typography>
       ) : (
-        <Typography
-          sx={{ flex: '1 1 100%' }}
-          variant='h6'
-          id='tableTitle'
-          component='div'
-        >
-          All Users
-        </Typography>
+        <>
+          <Typography
+            sx={{ flex: '1 1 100%' }}
+            variant='h6'
+            id='tableTitle'
+            component='div'
+          >
+            All Users
+          </Typography>
+        </>
       )}
 
       {numSelected > 0 && (
         <>
-          <Tooltip title='Block'>
+          <Tooltip title='Block/Unblock'>
             <IconButton onClick={onBlock}>
               <BlockIcon />
             </IconButton>
