@@ -1,7 +1,5 @@
 import asyncHandler from 'express-async-handler'
 import User from '../models/userModel.js'
-import { sendToken } from '../utils/sendToken.js'
-import jwt from 'jsonwebtoken'
 
 /**
  * @desc Get all users
