@@ -17,6 +17,7 @@
     "nodemon": "^2.0.20"
   },
   "dependencies": {
+    "@mui/x-data-grid": "^5.17.12",
     "bcryptjs": "^2.4.3",
     "colors": "^1.4.0",
     "cookie-parser": "^1.4.6",

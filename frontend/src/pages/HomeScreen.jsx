@@ -1,4 +1,4 @@
-import React from 'react'
+import {useState} from 'react'
 import { clearStore, getStore } from '../utils/lcs'
 import {useNavigate} from 'react-router-dom'
 import { useEffect } from 'react'
@@ -6,6 +6,7 @@ import Stack from '@mui/material/Stack'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import axios from 'axios'
+import UsersTable from '../components/UsersTable/UsersTable'
 const user = getStore('user')
 
 const HomeScreen = () => {
@@ -38,13 +39,24 @@ const HomeScreen = () => {
           width: '100%',
         }}
       >
-        <Stack spacing={2} direction='row' style={{padding: '10px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-          <h3>Task 4</h3>
-          <Button onClick={handleLogout} variant='contained'>Logout</Button>
+        <Stack
+          spacing={2}
+          direction='row'
+          style={{
+            padding: '10px 20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <h3>{user?.name}</h3>
+          <Button onClick={handleLogout} variant='contained'>
+            Logout
+          </Button>
         </Stack>
       </Box>
       <Box style={{ marginTop: '70px', padding: '20px' }}>
-        <h1>Welcome {user?.name}! You are logged in!</h1>
+        <UsersTable user={user} />
       </Box>
     </>
   )
