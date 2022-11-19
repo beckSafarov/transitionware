@@ -1,8 +1,52 @@
 import React from 'react'
+import { clearStore, getStore } from '../utils/lcs'
+import {useNavigate} from 'react-router-dom'
+import { useEffect } from 'react'
+import Stack from '@mui/material/Stack'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import axios from 'axios'
+const user = getStore('user')
 
 const HomeScreen = () => {
+  const navigate = useNavigate()
+  
+  useEffect(()=>{
+    if(!user) navigate('/login')
+  }, [user])
+
+  const handleLogout = async() => {
+    if(!window.confirm('Are you sure to logout?!')) return
+    try{
+      await axios.put('/api/auth/logout')
+      clearStore('user')
+      navigate('/login')
+    }catch(error){
+      console.error(error)
+    }
+  }
+  
   return (
-    <h1>Welcome Home! You are logged in!</h1>
+    <>
+      <Box
+        style={{
+          position: 'fixed',
+          top: '0',
+          left: '0',
+          height: 'fit-content',
+          background: '#f4f4f4',
+          width: '100%',
+        }}
+      >
+        <Stack spacing={2} direction='row' style={{padding: '10px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+          <h3>Task 4</h3>
+          <Button onClick={handleLogout} variant='contained'>Logout</Button>
+        </Stack>
+      </Box>
+      <Box style={{ marginTop: '70px', padding: '20px' }}>
+        <h1>Welcome {user?.name}! You are logged in!</h1>
+      </Box>
+    </>
   )
 }
 

@@ -5,10 +5,15 @@ import Stack from '@mui/material/Stack'
 import Button from '@mui/material/Button'
 import FullyCentered from '../../components/FullyCentered'
 import LinearLoading from '../../components/LinearLoading'
+import { fullConfig } from '../../utils/rxConfig'
+import { setStore } from '../../utils/lcs'
+import {useNavigate} from 'react-router-dom'
+import axios from 'axios'
 
-const SignUp = () => {
-  const [values, setValues] = useState({})
+const LoginScreen = () => {
+  const [values, setValues] = useState({email: "", password: ''})
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate()
   const handleChange = (e) => {
     const { name, value } = e.target
     setValues({
@@ -17,10 +22,24 @@ const SignUp = () => {
     })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault()
-    console.log(values)
+    if(!values.email || !values.password) return
+    setLoading(true)
+    try{
+      const res = await axios.post('/api/auth/login', values, fullConfig)
+      setLoading(false)
+      const user = res.data.data
+      if(!user.isBlocked){
+        setStore('user', user)
+        navigate('/home')
+      }
+    }catch(error){
+      setLoading(false)
+      console.error(error)
+    }
   }
+
   return (
     <FullyCentered top={'40%'}>
       <h1>Log in</h1>
@@ -58,4 +77,4 @@ const SignUp = () => {
   )
 }
 
-export default SignUp
+export default LoginScreen

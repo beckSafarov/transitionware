@@ -8,10 +8,7 @@ import LinearLoading from '../../components/LinearLoading'
 import axios from 'axios'
 import {useNavigate} from 'react-router-dom'
 import { setStore } from '../../utils/lcs'
-const axConfig = {
-  headers: { 'Content-Type': 'application/json' },
-  cancelToken: axios.CancelToken.source().token,
-}
+import { fullConfig } from '../../utils/rxConfig'
 
 const isValidEmail = (mail) => {
   const rgx = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
@@ -39,12 +36,10 @@ const SignUp = () => {
     if (!isValidated()) return
     setLoading(true)
     try {
-      const res = await axios.post('/api/auth', values, axConfig)
+      const res = await axios.post('/api/auth', values, fullConfig)
       setLoading(false)
-      if(res.status === 200){
-        setStore('user', res.data.data)
-        navigate('/home')
-      }
+      setStore('user', res.data.data)
+      navigate('/home')
     } catch (error) {
       setLoading(false)
       console.error(error)
