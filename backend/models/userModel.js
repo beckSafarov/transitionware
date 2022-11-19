@@ -25,5 +25,9 @@ const userSchema = mongoose.Schema(
   }
 )
 
+userSchema.methods.toggleBlock = async function () {
+  this.isBlocked = !this.isBlocked
+};
+
 const User = mongoose.model('User', userSchema)
 export default User

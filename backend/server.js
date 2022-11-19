@@ -13,7 +13,6 @@ app.use(cookieParser())
 connectDB()
 // const nodeEnv = process.env.NODE_ENV
 app.get('/', (req, res) => {
-  //this sends content for displaying, however, you would want a file here
   res.send('<h1>Hello World</h1>')
 })
 app.use('/api/auth', authRoutes)

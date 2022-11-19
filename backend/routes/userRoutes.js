@@ -1,8 +1,8 @@
 import express from 'express';
-import { getAllUsers } from '../controllers/userControllers.js';
+import { deleteUsers, getAllUsers, toggleBlockUsers } from '../controllers/userControllers.js';
 const router = express.Router();
 
-router.route('/').get(getAllUsers)
+router.route('/').get(getAllUsers).put(toggleBlockUsers).delete(deleteUsers)
 
 
 export default router;
