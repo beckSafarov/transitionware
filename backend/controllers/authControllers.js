@@ -33,6 +33,12 @@ export const authUser = asyncHandler(async (req, res) => {
     res.status(401)
     throw new Error(`Invalid credentials`)
   }
+  if(user.isBlocked){
+    res.status(401).json({
+      success: false, 
+      message: "Sorry you are blocked!"
+    })
+  }
 
   user.lastLoggedDate = new Date()
   await user.save()
@@ -48,6 +54,12 @@ export const me = asyncHandler(async (req, res, next) => {
   try {
     const decoded = jwt.verify(req.cookies.token, process.env.JWT_SECRET)
     const user = await User.findById(decoded.id)
+    if (user.isBlocked) {
+      res.status(404).json({ success: false, message: 'Sorry you are blocked!' })
+      next()
+    }
+    user.lastLoggedDate = new Date()
+    await user.save()
     res.status(200).json({ success: true, data: user })
   } catch (err) {
     err.success = false

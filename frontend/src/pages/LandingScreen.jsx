@@ -1,18 +1,18 @@
 import Stack from '@mui/material/Stack'
-import Box from '@mui/system/Box'
 import Button from '@mui/material/Button'
 import FullyCentered from '../components/FullyCentered'
 import {Link, useNavigate} from 'react-router-dom'
 import useAuthContext from '../hooks/useAuthContext'
 import { useEffect } from 'react'
-function App() {
+
+function LandingScreen() {
   const {user} = useAuthContext()
   const navigate = useNavigate()
   
   useEffect(()=>{
     if(user) navigate('/home') 
   }, [user])
-
+  console.log(user)
   return (
     <FullyCentered>
       <h1>Welcome to Jealousy App!</h1>
@@ -37,4 +37,4 @@ function App() {
   )
 }
 
-export default App
+export default LandingScreen

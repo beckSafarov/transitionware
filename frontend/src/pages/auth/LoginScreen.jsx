@@ -6,15 +6,16 @@ import Button from '@mui/material/Button'
 import FullyCentered from '../../components/FullyCentered'
 import LinearLoading from '../../components/LinearLoading'
 import { fullConfig } from '../../utils/rxConfig'
-import { setStore } from '../../utils/lcs'
 import {useNavigate, Link} from 'react-router-dom'
 import axios from 'axios'
 import useAuthContext from '../../hooks/useAuthContext'
+import AlertBox from '../../components/AlertBox'
 
 const LoginScreen = () => {
   const {user:loggedUser, setUser} = useAuthContext()
   const [values, setValues] = useState({email: "", password: ''})
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate()
 
   useEffect(()=>{
@@ -43,7 +44,7 @@ const LoginScreen = () => {
       }
     }catch(error){
       setLoading(false)
-      console.error(error)
+      setError(error.response.data.message)
     }
   }
 
@@ -51,6 +52,7 @@ const LoginScreen = () => {
     <FullyCentered top={'40%'}>
       <h1>Log in</h1>
       <LinearLoading show={loading}/>
+      <AlertBox>{error}</AlertBox>
       <form onSubmit={handleSubmit} style={{ minWidth: '500px' }}>
         <Stack direction='column' spacing={3}>
           <TextField
