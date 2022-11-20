@@ -1,32 +1,31 @@
-import {useState} from 'react'
-import { clearStore, getStore } from '../utils/lcs'
-import {useNavigate} from 'react-router-dom'
-import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Stack from '@mui/material/Stack'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import axios from 'axios'
 import UsersTable from '../components/UsersTable/UsersTable'
-const user = getStore('user')
+import useAuthContext from '../hooks/useAuthContext'
+import { useEffect} from 'react'
 
 const HomeScreen = () => {
+  const { user, authDone, clearUser } = useAuthContext()
   const navigate = useNavigate()
-  
-  useEffect(()=>{
-    if(!user) navigate('/login')
-  }, [user])
 
-  const handleLogout = async() => {
-    if(!window.confirm('Are you sure to logout?!')) return
-    try{
+  useEffect(() => {
+    if(!user && authDone) navigate('/login')
+  }, [user, authDone])
+
+  const handleLogout = async () => {
+    if (!window.confirm('Are you sure to logout?!')) return
+    try {
       await axios.put('/api/auth/logout')
-      clearStore('user')
+      clearUser()
       navigate('/login')
-    }catch(error){
+    } catch (error) {
       console.error(error)
     }
   }
-  
+
   return (
     <>
       <Box

@@ -6,3 +6,12 @@
 body{
   background: #fffefc;
 }
+
+a{
+  color: #007acc;
+  text-decoration: none;
+}
+
+a:hover{
+  text-decoration: underline;
+}

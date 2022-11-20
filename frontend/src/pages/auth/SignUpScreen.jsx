@@ -1,14 +1,13 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import {useNavigate, Link} from 'react-router-dom'
 import TextField from '@mui/material/TextField'
-import { useState } from 'react'
 import Stack from '@mui/material/Stack'
 import Button from '@mui/material/Button'
 import FullyCentered from '../../components/FullyCentered'
 import LinearLoading from '../../components/LinearLoading'
 import axios from 'axios'
-import {useNavigate} from 'react-router-dom'
-import { setStore } from '../../utils/lcs'
 import { fullConfig } from '../../utils/rxConfig'
+import useAuthContext from '../../hooks/useAuthContext'
 
 const isValidEmail = (mail) => {
   const rgx = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
@@ -16,9 +15,15 @@ const isValidEmail = (mail) => {
 }
 
 const SignUp = () => {
+  const {user:loggedUser, setUser} = useAuthContext()
   const [values, setValues] = useState({ name: '', email: '', password: '' })
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+
+  useEffect(()=>{
+    if(loggedUser) navigate('/home')
+  }, [loggedUser])
+
   const handleChange = (e) => {
     const { name, value } = e.target
     setValues({
@@ -38,7 +43,7 @@ const SignUp = () => {
     try {
       const res = await axios.post('/api/auth', values, fullConfig)
       setLoading(false)
-      setStore('user', res.data.data)
+      setUser(res.data.data)
       navigate('/home')
     } catch (error) {
       setLoading(false)
@@ -86,6 +91,9 @@ const SignUp = () => {
             >
               Submit
             </Button>
+            <div>
+              Already have an account? Log in <Link to='/login'>here</Link>
+            </div>
           </Stack>
         </form>
       </FullyCentered>

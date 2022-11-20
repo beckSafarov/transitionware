@@ -48,7 +48,7 @@ export const me = asyncHandler(async (req, res, next) => {
   try {
     const decoded = jwt.verify(req.cookies.token, process.env.JWT_SECRET)
     const user = await User.findById(decoded.id)
-    res.status(200).json({ success: true, user })
+    res.status(200).json({ success: true, data: user })
   } catch (err) {
     err.success = false
     res.status(404).json(err)

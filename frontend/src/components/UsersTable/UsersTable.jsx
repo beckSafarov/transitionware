@@ -14,17 +14,11 @@ import UsersTableHead from './UsersTableHead'
 import UsersTableToolbar from './UsersTableToolbar'
 import { fullConfig } from '../../utils/rxConfig'
 import LinearLoading from '../LinearLoading'
-import { clearStore } from '../../utils/lcs'
 import {useNavigate} from 'react-router-dom'
+import useAuthContext from '../../hooks/useAuthContext'
 
-function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1
-  }
-  return 0
+const descendingComparator = (a, b, orderBy) => {
+  return b[orderBy] < a[orderBy] ? -1 : b[orderBy] > a[orderBy] ? 1 : 0
 }
 
 function getComparator(order, orderBy) {
@@ -34,6 +28,7 @@ function getComparator(order, orderBy) {
 }
 
 export default function UsersTable({user}) {
+  const {clearUser} = useAuthContext()
   const [order, setOrder] = useState('asc')
   const [orderBy, setOrderBy] = useState('calories')
   const [selected, setSelected] = useState([])
@@ -146,7 +141,7 @@ export default function UsersTable({user}) {
       allUsers.length < 1 ||
       !allUsers.find((someUser) => someUser._id === user._id)
     ) {
-      clearStore('users')
+      clearUser()
       navigate('/login')
     }
   }
@@ -165,7 +160,7 @@ export default function UsersTable({user}) {
 
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - allUsers.length) : 0
-  // console.log(allUsers)
+
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>

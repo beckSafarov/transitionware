@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import TextField from '@mui/material/TextField'
 import { useState } from 'react'
 import Stack from '@mui/material/Stack'
@@ -7,13 +7,20 @@ import FullyCentered from '../../components/FullyCentered'
 import LinearLoading from '../../components/LinearLoading'
 import { fullConfig } from '../../utils/rxConfig'
 import { setStore } from '../../utils/lcs'
-import {useNavigate} from 'react-router-dom'
+import {useNavigate, Link} from 'react-router-dom'
 import axios from 'axios'
+import useAuthContext from '../../hooks/useAuthContext'
 
 const LoginScreen = () => {
+  const {user:loggedUser, setUser} = useAuthContext()
   const [values, setValues] = useState({email: "", password: ''})
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate()
+
+  useEffect(()=>{
+    if(loggedUser) navigate('/home')
+  }, [loggedUser])
+
   const handleChange = (e) => {
     const { name, value } = e.target
     setValues({
@@ -31,7 +38,7 @@ const LoginScreen = () => {
       setLoading(false)
       const user = res.data.data
       if(!user.isBlocked){
-        setStore('user', user)
+        setUser(user)
         navigate('/home')
       }
     }catch(error){
@@ -71,6 +78,9 @@ const LoginScreen = () => {
           >
             Submit
           </Button>
+          <div>
+            Do not have an account yet? Sign up <Link to='/signup'>here</Link> 
+          </div>
         </Stack>
       </form>
     </FullyCentered>
