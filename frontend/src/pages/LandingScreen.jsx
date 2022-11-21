@@ -10,7 +10,7 @@ function LandingScreen() {
   const navigate = useNavigate()
   
   useEffect(()=>{
-    if(user) navigate('/home') 
+    if (user && !user.isBlocked) navigate('/home') 
   }, [user])
   console.log(user)
   return (

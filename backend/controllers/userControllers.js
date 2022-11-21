@@ -34,7 +34,7 @@ export const toggleBlockUsers = asyncHandler(async (req, res) => {
 /**
  * @desc delete users
  * @route DELETE /api/users
- * @content Array [id1, id2, ...]
+ * @content Array [{_id}, {_id}, ...]
  */
 export const deleteUsers = asyncHandler(async (req, res) => {
   const { users: ids } = req.body

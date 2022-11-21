@@ -1,9 +1,7 @@
-import path from 'path'
 import dotenv from 'dotenv'
 import express from 'express'
 import connectDB from './config/db.js'
 import cookieParser from 'cookie-parser'
-import { signUser } from './controllers/authControllers.js'
 import authRoutes from './routes/authRoutes.js'
 import userRoutes from './routes/userRoutes.js'
 const app = express()

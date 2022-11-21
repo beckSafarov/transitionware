@@ -4,10 +4,11 @@ import IconButton from '@mui/material/IconButton'
 import DeleteIcon from '@mui/icons-material/Delete'
 import BlockIcon from '@mui/icons-material/Block'
 import Tooltip from '@mui/material/Tooltip'
+import RefreshIcon from '@mui/icons-material/Refresh'
 import { alpha } from '@mui/material/styles'
 import LinearLoading from '../LinearLoading'
 
-const UsersTableToolbar =({numSelected, onBlock, onDelete, loading})=>{
+const UsersTableToolbar =({numSelected, onBlock, onDelete, onRefresh})=>{
 
   return (
     <Toolbar
@@ -45,7 +46,7 @@ const UsersTableToolbar =({numSelected, onBlock, onDelete, loading})=>{
         </>
       )}
 
-      {numSelected > 0 && (
+      {numSelected > 0 ? (
         <>
           <Tooltip title='Block/Unblock'>
             <IconButton onClick={onBlock}>
@@ -58,6 +59,12 @@ const UsersTableToolbar =({numSelected, onBlock, onDelete, loading})=>{
             </IconButton>
           </Tooltip>
         </>
+      ) : (
+        <Tooltip title='Refresh'>
+          <IconButton onClick={onRefresh}>
+            <RefreshIcon/>
+          </IconButton>
+        </Tooltip>
       )}
     </Toolbar>
   )
@@ -67,6 +74,7 @@ UsersTableToolbar.defaultProps = {
   numSelected: 0, 
   onBlock: ()=>void(0),
   onDelete: ()=>void(0),
+  onRefresh: ()=>void(0)
 }
 
 

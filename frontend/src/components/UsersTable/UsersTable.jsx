@@ -28,7 +28,7 @@ function getComparator(order, orderBy) {
 }
 
 export default function UsersTable({user}) {
-  const {clearUser} = useAuthContext()
+  const {clearUser, block:blockInContext} = useAuthContext()
   const [order, setOrder] = useState('asc')
   const [orderBy, setOrderBy] = useState('calories')
   const [selected, setSelected] = useState([])
@@ -105,10 +105,18 @@ export default function UsersTable({user}) {
     }
   }
 
+  const handleSelfBlock = () => {
+    if(selected.find((blocked=>blocked._id === user._id))){
+      navigate('/login')
+    }
+  }
+
   const handleBlock = async() => {
     if(!window.confirm('Are you sure?')) return
     blockLocally()
     await sendBlockRequest()
+    blockInContext()
+    handleSelfBlock()
     setSelected([])
   }
 
@@ -128,7 +136,7 @@ export default function UsersTable({user}) {
   const sendDeleteRequest = async() => {
     try {
       setLoading(true)
-      await axios.delete('/api/users', { users: selected }, fullConfig)
+      await axios.put('/api/users/delete', {users: selected}, fullConfig)
       setLoading(false)
     } catch (error) {
       setLoading(false)
@@ -137,10 +145,7 @@ export default function UsersTable({user}) {
   }
 
   const handleSuicide = () => {
-    if (
-      allUsers.length < 1 ||
-      !allUsers.find((someUser) => someUser._id === user._id)
-    ) {
+    if (selected.find((killed) => killed._id === user._id)) {
       clearUser()
       navigate('/login')
     }
@@ -153,6 +158,8 @@ export default function UsersTable({user}) {
     handleSuicide()
     setSelected([])
   }
+
+  const handleRefresh = async() => await getUsersFromDB()
 
   const isSelected = (_id) => {
     return !!selected.find(item=>item._id === _id)
@@ -168,6 +175,7 @@ export default function UsersTable({user}) {
           numSelected={selected.length}
           onBlock={handleBlock}
           onDelete={handleDelete}
+          onRefresh={handleRefresh}
         />
         <TableContainer>
           <Table

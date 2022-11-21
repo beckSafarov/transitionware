@@ -19,7 +19,7 @@ const LoginScreen = () => {
   const navigate = useNavigate()
 
   useEffect(()=>{
-    if(loggedUser) navigate('/home')
+    if(loggedUser && !loggedUser.isBlocked) navigate('/home')
   }, [loggedUser])
 
   const handleChange = (e) => {
