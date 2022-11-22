@@ -1,23 +1,16 @@
-import path from 'path'
 import dotenv from 'dotenv'
 import express from 'express'
 import connectDB from './config/db.js'
 import cookieParser from 'cookie-parser'
 import authRoutes from './routes/authRoutes.js'
 import userRoutes from './routes/userRoutes.js'
+var cors = require('cors');
 const app = express()
+app.use(cors())
 dotenv.config()
 app.use(express.json())
 app.use(cookieParser())
 connectDB()
-const nodeEnv = process.env.NODE_ENV
-const __dirname = path.resolve()
-if (nodeEnv === 'production') {
-  app.use(express.static(path.join(__dirname, '/frontend/build')))
-  app.get('*', (req, res) =>
-    res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'))
-  )
-}
 
 app.get('/', (req, res) => {
   res.send('<h1>Hello World</h1>')
