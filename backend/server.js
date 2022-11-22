@@ -11,7 +11,7 @@ app.use(express.json())
 app.use(cookieParser())
 connectDB()
 const nodeEnv = process.env.NODE_ENV
-
+const __dirname = path.resolve()
 if (nodeEnv === 'production') {
   app.use(express.static(path.join(__dirname, '/frontend/build')))
   app.get('*', (req, res) =>
