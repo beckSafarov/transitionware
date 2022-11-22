@@ -4,7 +4,7 @@ import connectDB from './config/db.js'
 import cookieParser from 'cookie-parser'
 import authRoutes from './routes/authRoutes.js'
 import userRoutes from './routes/userRoutes.js'
-var cors = require('cors');
+import cors from 'cors'
 const app = express()
 app.use(cors())
 dotenv.config()
