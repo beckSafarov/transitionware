@@ -15,8 +15,8 @@ const HomeScreen = () => {
     if(!user && authDone) navigate('/login')
   }, [user, authDone])
 
-  const handleLogout = async () => {
-    if (!window.confirm('Are you sure to logout?!')) return
+  const handleLogout = async (confirm=true) => {
+    if (confirm && !window.confirm('Are you sure to logout?!')) return
     try {
       await axios.put('/api/auth/logout')
       clearUser()
@@ -55,7 +55,7 @@ const HomeScreen = () => {
         </Stack>
       </Box>
       <Box style={{ marginTop: '70px', padding: '20px' }}>
-        <UsersTable user={user} />
+        <UsersTable user={user} onLogout={handleLogout} />
       </Box>
     </>
   )

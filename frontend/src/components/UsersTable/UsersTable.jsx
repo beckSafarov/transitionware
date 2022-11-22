@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import { useMemo, useState } from 'react'
 import Box from '@mui/material/Box'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -14,7 +14,6 @@ import UsersTableHead from './UsersTableHead'
 import UsersTableToolbar from './UsersTableToolbar'
 import { fullConfig } from '../../utils/rxConfig'
 import LinearLoading from '../LinearLoading'
-import {useNavigate} from 'react-router-dom'
 import useAuthContext from '../../hooks/useAuthContext'
 
 const descendingComparator = (a, b, orderBy) => {
@@ -27,33 +26,37 @@ function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy)
 }
 
-export default function UsersTable({user}) {
-  const {clearUser, block:blockInContext} = useAuthContext()
+export default function UsersTable({ user, onLogout }) {
+  const { clearUser, block: blockInContext } = useAuthContext()
   const [order, setOrder] = useState('asc')
   const [orderBy, setOrderBy] = useState('calories')
   const [selected, setSelected] = useState([])
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(5)
-  const [loading, setLoading] = useState(false);
-  const [allUsers, setAllUsers] = useState([]);
-  const navigate = useNavigate()
+  const [loading, setLoading] = useState(false)
+  const [allUsers, setAllUsers] = useState([])
   useEffect(() => {
     getUsersFromDB()
   }, [])
 
-  const getUsersFromDB = async() => {
-    try{
+  const getUsersFromDB = async () => {
+    try {
       setLoading(true)
       const res = await axios.get('/api/users')
       setLoading(false)
-      setAllUsers(res.data.data)
-    }catch(error){
+      const newUserData = res.data.data
+      if (newUserData.isBlocked) {
+        onLogout(false)
+        return
+      }
+      setAllUsers(newUserData)
+    } catch (error) {
       setLoading(false)
       console.error(error)
     }
   }
 
-  const handleRequestSort = (event, property) => {
+  const handleRequestSort = (_, property) => {
     const isAsc = orderBy === property && order === 'asc'
     setOrder(isAsc ? 'desc' : 'asc')
     setOrderBy(property)
@@ -74,12 +77,12 @@ export default function UsersTable({user}) {
     setSelected(selected.filter((elem) => elem._id !== clickedUser._id))
   }
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = (_, newPage) => {
     setPage(newPage)
   }
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value)
+  const handleChangeRowsPerPage = (e) => {
+    setRowsPerPage(+e.target.value)
     setPage(0)
   }
 
@@ -94,29 +97,28 @@ export default function UsersTable({user}) {
     )
   }
 
-  const sendBlockRequest = async(params) => {
-    try{
+  const sync = async (type = 'block') => {
+    const path = `/api/users/${type === 'delete' ? 'delete' : ''}`
+    try {
       setLoading(true)
-      await axios.put('/api/users', {users: selected}, fullConfig)
+      await axios.put(path, { users: selected }, fullConfig)
       setLoading(false)
-    }catch(error){
+    } catch (error) {
       setLoading(false)
       console.error(error)
     }
   }
 
-  const handleSelfBlock = () => {
-    if(selected.find((blocked=>blocked._id === user._id))){
-      navigate('/login')
-    }
+  const handleSelectedSelf = () => {
+    if (selected.find((s) => s._id === user._id)) onLogout(false)
   }
 
-  const handleBlock = async() => {
-    if(!window.confirm('Are you sure?')) return
+  const handleBlock = async () => {
+    if (!window.confirm('Are you sure?')) return
     blockLocally()
-    await sendBlockRequest()
+    await sync()
     blockInContext()
-    handleSelfBlock()
+    handleSelectedSelf()
     setSelected([])
   }
 
@@ -124,7 +126,7 @@ export default function UsersTable({user}) {
     if (selected.length === allUsers.length) {
       setAllUsers([])
       return
-    } 
+    }
     setAllUsers(
       allUsers.filter(
         (currUser) =>
@@ -133,40 +135,24 @@ export default function UsersTable({user}) {
     )
   }
 
-  const sendDeleteRequest = async() => {
-    try {
-      setLoading(true)
-      await axios.put('/api/users/delete', {users: selected}, fullConfig)
-      setLoading(false)
-    } catch (error) {
-      setLoading(false)
-      console.error(error)
-    }
-  }
-
-  const handleSuicide = () => {
-    if (selected.find((killed) => killed._id === user._id)) {
-      clearUser()
-      navigate('/login')
-    }
-  }
-
   const handleDelete = async () => {
     if (!window.confirm('Are you sure?')) return
     deleteLocally()
-    await sendDeleteRequest()
-    handleSuicide()
+    await sync('delete')
+    handleSelectedSelf()
     setSelected([])
   }
 
-  const handleRefresh = async() => await getUsersFromDB()
+  const handleRefresh = async () => await getUsersFromDB()
 
   const isSelected = (_id) => {
-    return !!selected.find(item=>item._id === _id)
+    return !!selected.find((item) => item._id === _id)
   }
 
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - allUsers.length) : 0
+
+  const formatDate = (dateString) => new Date(dateString).toDateString()
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -198,7 +184,8 @@ export default function UsersTable({user}) {
                 .map((row, index) => {
                   const isItemSelected = isSelected(row._id)
                   const labelId = `enhanced-table-checkbox-${index}`
-
+                  const lastLoggedDate = formatDate(row.lastLoggedDate)
+                  const regDate = formatDate(row.regDate)
                   return (
                     <TableRow
                       hover
@@ -234,12 +221,8 @@ export default function UsersTable({user}) {
                       <TableCell align='left'>
                         {row.isBlocked ? 'blocked' : 'active'}
                       </TableCell>
-                      <TableCell align='left'>
-                        {row.lastLoggedDate?.toDateString?.() || 'May 24, 2022'}
-                      </TableCell>
-                      <TableCell align='left'>
-                        {row.regDate?.toDateString?.() || 'May 24, 2022'}
-                      </TableCell>
+                      <TableCell align='left'>{lastLoggedDate}</TableCell>
+                      <TableCell align='left'>{regDate}</TableCell>
                     </TableRow>
                   )
                 })}
