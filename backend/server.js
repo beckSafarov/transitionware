@@ -9,7 +9,15 @@ dotenv.config()
 app.use(express.json())
 app.use(cookieParser())
 connectDB()
-// const nodeEnv = process.env.NODE_ENV
+const nodeEnv = process.env.NODE_ENV
+
+if (nodeEnv === 'production') {
+  app.use(express.static(path.join(__dirname, '/frontend/build')))
+  app.get('*', (req, res) =>
+    res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'))
+  )
+}
+
 app.get('/', (req, res) => {
   res.send('<h1>Hello World</h1>')
 })
