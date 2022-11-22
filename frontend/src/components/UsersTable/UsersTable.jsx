@@ -27,7 +27,7 @@ function getComparator(order, orderBy) {
 }
 
 export default function UsersTable({ user, onLogout }) {
-  const { clearUser, block: blockInContext } = useAuthContext()
+  const { block: blockInContext } = useAuthContext()
   const [order, setOrder] = useState('asc')
   const [orderBy, setOrderBy] = useState('calories')
   const [selected, setSelected] = useState([])
@@ -45,10 +45,6 @@ export default function UsersTable({ user, onLogout }) {
       const res = await axios.get('/api/users')
       setLoading(false)
       const newUserData = res.data.data
-      if (newUserData.isBlocked) {
-        onLogout(false)
-        return
-      }
       setAllUsers(newUserData)
     } catch (error) {
       setLoading(false)

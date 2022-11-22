@@ -18,7 +18,6 @@ function App() {
   const handleAuth = async () => {
     try {
       const res = await axios.get('/api/auth/me')
-      if(res.data.data.isBlocke)
       setUser(res.data.data)
     } catch (error) {
       authUnsuccessful()
