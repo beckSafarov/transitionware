@@ -18,12 +18,12 @@ app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
   next();
 });
-app.use('/', (req, res)=>{
-  res.send('<h1>API is running</h1>')
-})
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
 
+app.use('/', (req, res)=>{
+  res.send('<h1>API is running</h1>')
+})
 
 const PORT = process.env.PORT || 5000
 app.listen(
