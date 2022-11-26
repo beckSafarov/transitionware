@@ -3,7 +3,7 @@ import User from '../models/userModel_t4.js'
 
 /**
  * @desc Get all users
- * @route GET /api/users
+ * @route GET /t4/users
  */
 export const getAllUsers = asyncHandler(async (req, res) => {
   const allUsers = await User.find({})
@@ -14,7 +14,7 @@ export const getAllUsers = asyncHandler(async (req, res) => {
 })
 /**
  * @desc Toggle block status of users
- * @route PUT /api/users
+ * @route PUT /t4/users
  * @content Array [id1, id2, ...]
  */
 export const toggleBlockUsers = asyncHandler(async (req, res) => {
@@ -33,7 +33,7 @@ export const toggleBlockUsers = asyncHandler(async (req, res) => {
 })
 /**
  * @desc delete users
- * @route DELETE /api/users
+ * @route DELETE /t4/users
  * @content Array [{_id}, {_id}, ...]
  */
 export const deleteUsers = asyncHandler(async (req, res) => {
