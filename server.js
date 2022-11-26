@@ -2,8 +2,8 @@ import dotenv from 'dotenv'
 import express from 'express'
 import connectDB from './config/db.js'
 import cookieParser from 'cookie-parser'
-import authRoutes from './routes/authRoutes.js'
-import userRoutes from './routes/userRoutes.js'
+import authRoutes from './routes/authRoutes_t4.js'
+import userRoutes from './routes/userRoutes_t4.js'
 import cors from 'cors'
 const nodeEnv = process.env.NODE_ENV
 const app = express()
@@ -18,8 +18,8 @@ app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
   next();
 });
-app.use('/api/auth', authRoutes)
-app.use('/api/users', userRoutes)
+app.use('/t4/auth', authRoutes)
+app.use('/t4/users', userRoutes)
 
 app.use('/', (req, res)=>{
   res.send('<h1>API is running</h1>')

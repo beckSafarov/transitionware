@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 // import bcrypt from 'bcryptjs'
 
-const userSchema = mongoose.Schema(
+const UserSchema_t4 = mongoose.Schema(
   {
     name: {
       type: String, 
@@ -33,9 +33,9 @@ const userSchema = mongoose.Schema(
   }
 )
 
-userSchema.methods.toggleBlock = async function () {
+UserSchema_t4.methods.toggleBlock = async function () {
   this.isBlocked = !this.isBlocked
 };
 
-const User = mongoose.model('User', userSchema)
-export default User
+const User_t4 = mongoose.model('User_t4', UserSchema_t4)
+export default User_t4

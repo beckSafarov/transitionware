@@ -1,6 +1,6 @@
 import express from 'express';
 const router = express.Router();
-import { authUser, logout, me, signUser } from '../controllers/authControllers.js';
+import { authUser, logout, me, signUser } from '../controllers/authControllers_t4.js';
 
 router.route('/').post(signUser);
 
