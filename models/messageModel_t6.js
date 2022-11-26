@@ -19,6 +19,10 @@ const messageSchema_t6 = mongoose.Schema(
     body: {
       type: String, 
       required: true
+    },
+    date: {
+      type: Date,
+      default: new Date
     }
   }
 )
