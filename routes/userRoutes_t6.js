@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllUsers } from '../controllers/userControllers_t6';
+import { getAllUsers } from '../controllers/userControllers_t6.js';
 const router = express.Router();
 
 router.route('/').get(getAllUsers)
